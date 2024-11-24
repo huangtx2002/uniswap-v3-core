@@ -72,9 +72,11 @@ library Tick {
         uint256 feeGrowthBelow0X128;
         uint256 feeGrowthBelow1X128;
         if (tickCurrent >= tickLower) {
+            // Outside is relative to  tickCurrent - otherSide- so not absulate, lower.feeGrowthOutside0X128 represents the fee growth below tickLower
             feeGrowthBelow0X128 = lower.feeGrowthOutside0X128;
             feeGrowthBelow1X128 = lower.feeGrowthOutside1X128;
         } else {
+            // because tickCurrent < tickLower, lower.feeGrowthOutside0X128 represents the fee growth above tickUpper
             feeGrowthBelow0X128 = feeGrowthGlobal0X128 - lower.feeGrowthOutside0X128;
             feeGrowthBelow1X128 = feeGrowthGlobal1X128 - lower.feeGrowthOutside1X128;
         }
@@ -144,6 +146,8 @@ library Tick {
         info.liquidityGross = liquidityGrossAfter;
 
         // when the lower (upper) tick is crossed left to right (right to left), liquidity must be added (removed)
+        // left to right - liquidityDelta is positive, right to left - liquidityDelta is negative
+        // if lower, liquidity is added; if upper, liquidity is subsracted.
         info.liquidityNet = upper
             ? int256(info.liquidityNet).sub(liquidityDelta).toInt128()
             : int256(info.liquidityNet).add(liquidityDelta).toInt128();
