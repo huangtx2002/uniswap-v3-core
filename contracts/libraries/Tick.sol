@@ -179,6 +179,7 @@ library Tick {
         uint32 time
     ) internal returns (int128 liquidityNet) {
         Tick.Info storage info = self[tick];
+        // Because of crossing, outside changes to the other side.
         info.feeGrowthOutside0X128 = feeGrowthGlobal0X128 - info.feeGrowthOutside0X128;
         info.feeGrowthOutside1X128 = feeGrowthGlobal1X128 - info.feeGrowthOutside1X128;
         info.secondsPerLiquidityOutsideX128 = secondsPerLiquidityCumulativeX128 - info.secondsPerLiquidityOutsideX128;

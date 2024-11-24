@@ -198,7 +198,7 @@ contract UniswapV3Pool is IUniswapV3Pool, NoDelegateCall {
         }
 
         Slot0 memory _slot0 = slot0;
-
+        // Slot0 is the current tick; pls remember the relatively for Cumulative and Outside
         if (_slot0.tick < tickLower) {
             return (
                 tickCumulativeLower - tickCumulativeUpper,
