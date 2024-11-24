@@ -12,8 +12,8 @@ library TickBitmap {
     /// @return wordPos The key in the mapping containing the word in which the bit is stored
     /// @return bitPos The bit position in the word where the flag is stored
     function position(int24 tick) private pure returns (int16 wordPos, uint8 bitPos) {
-        wordPos = int16(tick >> 8);
-        bitPos = uint8(tick % 256);
+        wordPos = int16(tick >> 8);  // wordPos = tick / 256 - word index
+        bitPos = uint8(tick % 256);  // bitPos = tick % 256 - bit index or word offset
     }
 
     /// @notice Flips the initialized state for a given tick from false to true, or vice versa
@@ -21,7 +21,7 @@ library TickBitmap {
     /// @param tick The tick to flip
     /// @param tickSpacing The spacing between usable ticks
     function flipTick(
-        mapping(int16 => uint256) storage self,
+        mapping(int16 => uint256) storage self, // mapping of int16 to uint256
         int24 tick,
         int24 tickSpacing
     ) internal {
@@ -49,6 +49,8 @@ library TickBitmap {
         if (tick < 0 && tick % tickSpacing != 0) compressed--; // round towards negative infinity
 
         if (lte) {
+            // Rightmost bit (bit 0) is the lowest tick in the word
+            // Leftmost bit (bit 255) is the highest tick in the word
             (int16 wordPos, uint8 bitPos) = position(compressed);
             // all the 1s at or to the right of the current bitPos
             uint256 mask = (1 << bitPos) - 1 + (1 << bitPos);

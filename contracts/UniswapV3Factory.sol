@@ -15,9 +15,9 @@ contract UniswapV3Factory is IUniswapV3Factory, UniswapV3PoolDeployer, NoDelegat
     address public override owner;
 
     /// @inheritdoc IUniswapV3Factory
-    mapping(uint24 => int24) public override feeAmountTickSpacing;
+    mapping(uint24 => int24) public override feeAmountTickSpacing; // fee => tickSpacing
     /// @inheritdoc IUniswapV3Factory
-    mapping(address => mapping(address => mapping(uint24 => address))) public override getPool;
+    mapping(address => mapping(address => mapping(uint24 => address))) public override getPool;  // token0 => token1 => fee => pool
 
     constructor() {
         owner = msg.sender;
@@ -64,6 +64,8 @@ contract UniswapV3Factory is IUniswapV3Factory, UniswapV3PoolDeployer, NoDelegat
         // tick spacing is capped at 16384 to prevent the situation where tickSpacing is so large that
         // TickBitmap#nextInitializedTickWithinOneWord overflows int24 container from a valid tick
         // 16384 ticks represents a >5x price change with ticks of 1 bips
+        // this is a reasonable constraint given the maximum fee of 1% and the minimum tick of 1 bips
+        // price = 1.0001^16384 = 5.116 (a > 5x price change) - balance between gas efficiency and price granularity
         require(tickSpacing > 0 && tickSpacing < 16384);
         require(feeAmountTickSpacing[fee] == 0);
 
